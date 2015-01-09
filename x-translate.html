@@ -1,0 +1,93 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<!--
+Element providing translation of text.
+
+##### Example
+
+    <x-translate></x-translate>
+
+    <h1> translate="HEADER">I will take the value of HEADER.</h1>
+    <p> translate="ABOUT">I'll become the value of the ABOUT key.</h1>
+
+@element x-translate
+@blurb Element providing translation of text.
+@status alpha
+@homepage http://foo
+-->
+<polymer-element name="x-translate" attributes="notitle author">
+
+  <script>
+  (function () {
+      'use strict';
+
+    Polymer({
+      /**
+       * The `author` attribute sets an initial author
+       *
+       * @attribute author
+       * @type string
+       * @default 'Tryggvi Gylfason'
+       */
+      author: 'Tryggvi Gylfason',
+
+      ready: function() {
+        this.targets = getTranslateTargets();
+      },
+
+      /**
+       * The `use` method will translate the text content of all elements marked
+       * with a translation key if it can find said key in the newLang parameter.
+       *
+       * ex: <small>&lt;h1 translate="HEADER"> I am header &lt;/h1></small>
+       * 
+       * @method use
+       * @param {Object} newLang Pass in the translation object. ('default' will translate to the original text content). 
+       */
+      use: function(newLang) {
+
+        if(!newLang || newLang === 'default')
+          return setDefaultLang(this.targets);
+
+        this.targets.map(function(currTarget) {
+          var target = currTarget;
+
+          Object.keys(newLang).forEach(function(currKey) {
+            if (target.key === currKey) {
+              target.elem.textContent = newLang[currKey];
+            }
+            return target;
+          });
+
+          return target;
+        });
+      }
+
+    });
+
+    function getTranslateTargets() {
+      // fetch all elements with the translate attribute.
+      var elems = document.querySelectorAll('[translate]');
+
+      // construct the translateData array from the htmlCollection array.
+      var translateData = [].map.call(elems, function(currEl) {
+        return {
+          elem : currEl,
+          key  : currEl.getAttribute('translate'),
+          default : currEl.textContent
+        }
+      });
+      return translateData;
+    }
+
+    function setDefaultLang(targets) {
+      targets.forEach(function(target) {
+        target.elem.textContent = target.default;
+      });
+    }
+
+  })();
+
+  </script>
+
+</polymer-element>
