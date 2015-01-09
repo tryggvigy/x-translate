@@ -1,33 +1,32 @@
-seed-element
+x-translate
 ============
 
-See the [component page](http://polymerlabs.github.io/seed-element) for more information.
+See the [component page](tryggvigy.github.io/x-translate) for more information.
 
-## Getting Started
+## &lt;x-translate&gt;
 
-We've put together a [guide to seed-element](http://www.polymer-project.org/docs/start/reusableelements.html) to help get you rolling.
+## Installation
+> bower install x-translate
 
-## Testing Your Element
+## How to use
 
-Add the logic specific to your new element and verify its functionality. Good unit tests are essential to your verification plan but a good way to quickly sanity test your component is to access your demo.html file via a local web server. There are several ways to do this but one easy method is to run a simple web server that ships with Python, using the commands:
+The code below translates the h1 element to Icelandic.
 
-```sh
-python -m SimpleHTTPServer
+html:
+```html
+<body>
+  <x-translate></x-translate>
+
+  <h1 translate="HEADER"> English! </h1>
+</body>
 ```
 
-Or other method using NodeJS:
+```js
+var langIS = {
+  HEADER : "Íslenska!"
+}
 
-```sh
-http-server ./
-```
-
-This starts a web server on port 8000, so you can test your new element by navigating a browser to `localhost:8000/test/index.html`.
-
-### web-component-tester
-
-The tests are also compatible with [web-component-tester](https://github.com/Polymer/web-component-tester). You can run them on multiple local browsers via:
-
-```sh
-npm install -g web-component-tester
-wct
+var translator = document.querySelector('x-translate');
+translator.use(langIS);
+});
 ```
