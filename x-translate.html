@@ -13,7 +13,7 @@ Element providing translation of text.
 @element x-translate
 @blurb Element providing translation of text.
 @status alpha
-@homepage http://foo
+@homepage https://github.com/tryggvigy/x-translate
 -->
 <polymer-element name="x-translate" attributes="notitle author">
 
@@ -22,15 +22,7 @@ Element providing translation of text.
       'use strict';
 
     Polymer({
-      /**
-       * The `author` attribute sets an initial author
-       *
-       * @attribute author
-       * @type string
-       * @default 'Tryggvi Gylfason'
-       */
-      author: 'Tryggvi Gylfason',
-
+      
       ready: function() {
         this.targets = getTranslateTargets();
       },
@@ -40,9 +32,9 @@ Element providing translation of text.
        * with a translation key if it can find said key in the newLang parameter.
        *
        * ex: <small>&lt;h1 translate="HEADER"> I am header &lt;/h1></small>
-       * 
+       *
        * @method use
-       * @param {Object} newLang Pass in the translation object. ('default' will translate to the original text content). 
+       * @param {Object} newLang Pass in the translation object. ('default' will translate to the original text content).
        */
       use: function(newLang) {
 
