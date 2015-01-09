@@ -21,6 +21,7 @@ html:
 </body>
 ```
 
+js:
 ```js
 var langIS = {
   HEADER : "Íslenska!"
