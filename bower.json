@@ -1,10 +1,10 @@
 {
   "name": "x-translate",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "authors": [
     "Tryggvi Gylfason <tryggvigy@gmail.com>"
   ],
-  "description": "Element providing solution to no problem in particular.",
+  "description": "Custom element providing translation of text.",
   "keywords": [
     "web-component",
     "web-components",
@@ -17,11 +17,14 @@
   "license": "MIT",
   "homepage": "https://github.com/tryggvigy/x-translate/",
   "ignore": [
-    "/.*",
-    "/tests/"
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
   ],
   "dependencies": {
-    "polymer": "Polymer/polymer#^0.5.2"
+    "polymer": "~0.5.2"
   },
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^2.0.5"
