@@ -10,7 +10,11 @@ See the [component page](tryggvigy.github.io/x-translate) for more information.
 
 ## How to use
 
-The code below translates the h1 element to Icelandic.
+Supported translation methods:
+
+#### Translate with an object
+
+Translate the h1 element to Icelandic from definitions in an object.
 
 html:
 ```html
@@ -29,5 +33,25 @@ var langIS = {
 
 var translator = document.querySelector('x-translate');
 translator.use(langIS);
+});
+```
+
+#### JSON file translation
+
+Translation with a JSON file.
+
+html:
+```html
+<body>
+  <x-translate use="IS.json"></x-translate>
+
+  <h1 translate="HEADER"> English! </h1>
+</body>
+```
+
+js:
+```js
+var translator = document.querySelector('x-translate');
+translator.use('json');
 });
 ```

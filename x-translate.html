@@ -1,4 +1,5 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../core-ajax/core-ajax.html">
 
 <!--
 Element providing translation of text.
@@ -15,7 +16,14 @@ Element providing translation of text.
 @status alpha
 @homepage https://github.com/tryggvigy/x-translate
 -->
-<polymer-element name="x-translate" attributes="notitle author">
+<polymer-element name="x-translate" attributes="uses">
+
+  <template>
+    <core-ajax
+      url=""
+      handleAs="json"
+    </core-ajax>
+  </template>
 
   <script>
   (function () {
@@ -25,34 +33,57 @@ Element providing translation of text.
       
       ready: function() {
         this.targets = getTranslateTargets();
+        checkForJSON(this);
       },
 
       /**
        * The `use` method will translate the text content of all elements marked
        * with a translation key if it can find said key in the newLang parameter.
        *
-       * ex: <small>&lt;h1 translate="HEADER"> I am header &lt;/h1></small>
+       * This function can handle three cases.
+       * <ol>
+       *   <li>.use(any javascript object);</li>
+       *   <li>.use('default');</li>
+       *   <li>.use('json');</li>
+       * </ol>
+       * See the demo-page, where each case is shown respectfully.
        *
        * @method use
-       * @param {Object} newLang Pass in the translation object. ('default' will translate to the original text content).
+       * @param {Object|String} newLang The new language definition, or a hint for where it can be found.
        */
       use: function(newLang) {
 
-        if(!newLang || newLang === 'default')
+        // case: default
+        if(newLang === 'default')
           return setDefaultLang(this.targets);
 
-        this.targets.map(function(currTarget) {
-          var target = currTarget;
+        // case: json
+        else if(newLang === 'json') {
+          //save reference to x-translate element to use in the eventListener.
+          var xTranslate = this;
 
-          Object.keys(newLang).forEach(function(currKey) {
-            if (target.key === currKey) {
-              target.elem.textContent = newLang[currKey];
+          this.ajax.addEventListener("core-response", 
+            function(e) {
+              newLang = e.detail.response;
+              setLang(xTranslate.targets, newLang);
             }
-            return target;
-          });
+          );
 
-          return target;
-        });
+          //fire off the ajax request.
+          this.ajax.go();
+        }
+
+        //case: javascript object
+        else if(newLang !== null && typeof newLang === 'object') {
+          setLang(this.targets, newLang);
+        }
+
+        //if no cases trigger, log an error.
+        else {
+          var e = Error('Case not recognized.');
+          console.error(e.stack);
+        }
+
       }
 
     });
@@ -76,6 +107,34 @@ Element providing translation of text.
       targets.forEach(function(target) {
         target.elem.textContent = target.default;
       });
+    }
+    
+    function setLang(targets, lang) {
+      targets.map(function(currTarget) {
+        var target = currTarget;
+
+        Object.keys(lang).forEach(function(currKey) {
+          if (target.key === currKey) {
+            target.elem.textContent = lang[currKey];
+          }
+          return target;
+        });
+
+        return target;
+      });
+    }
+
+    function checkForJSON(xTranslate) {
+      var ajax = xTranslate.shadowRoot.querySelector('core-ajax');
+
+      if(!xTranslate.uses || xTranslate.uses === '') {
+        //no json is being used.
+        return;
+      }
+
+      ajax.setAttribute('url', xTranslate.uses);
+
+      xTranslate.ajax = ajax;
     }
 
   })();

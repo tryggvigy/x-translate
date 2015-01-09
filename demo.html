@@ -19,11 +19,12 @@
 
 </head>
 <body unresolved>
-  <x-translate></x-translate>
+  <x-translate uses="IS.json"></x-translate>
 
    <main>
     <button name="button">translate</button>
     <button class="default">default</button>
+    <button class="json">json</button>
     <p translate="HEADER"> header </p>
     <div translate="FOO"> i am english </div>
   </main>
@@ -46,7 +47,11 @@
 
       // if 'default' or falsy is passed into use(), the original text will be applied.
       document.querySelector('.default').addEventListener('click', function() {
-        xTranslate.use('default');
+        xTranslate.use('d');
+      });
+
+      document.querySelector('.json').addEventListener('click', function() {
+        xTranslate.use('json');
       });
 
     });
