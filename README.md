@@ -1,7 +1,7 @@
 x-translate
 ============
 
-See the [component page](tryggvigy.github.io/x-translate) for more information.
+See the [component page](tryggvi.me/x-translate) for more information.
 
 ## &lt;x-translate&gt;
 
