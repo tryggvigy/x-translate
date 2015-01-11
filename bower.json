@@ -25,7 +25,7 @@
   ],
   "dependencies": {
     "polymer": "~0.5.2",
-    "Polymer/core-ajax"
+    "Polymer/core-ajax": "latest"
   },
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^2.0.5"
