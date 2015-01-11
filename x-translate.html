@@ -68,6 +68,12 @@ Element providing translation of text.
               setLang(xTranslate.targets, newLang);
             }
           );
+          this.ajax.addEventListener("core-error", 
+            function(e) {
+              var err = Error(e.detail.response);
+              console.error(err.stack);
+            }
+          );
 
           //fire off the ajax request.
           this.ajax.go();
@@ -80,8 +86,9 @@ Element providing translation of text.
 
         //if no cases trigger, log an error.
         else {
-          var e = Error('Case not recognized.');
-          console.error(e.stack);
+          var err = Error('Case not recognized.');
+          console.error(err.stack);
+          return err;
         }
 
       }

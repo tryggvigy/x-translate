@@ -1,12 +1,3 @@
-<!--
-    @license
-    Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
-    This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-    The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-    The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-    Code distributed by Google as part of the polymer project is also
-    subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
 <!doctype html>
 <html>
 <head>
@@ -18,35 +9,56 @@
   <script src="../../web-component-tester/browser.js"></script>
 
   <!-- Step 1: import the element to test -->
-  <link rel="import" href="../seed-element.html">
+  <link rel="import" href="../x-translate.html">
+  <!-- <link rel="import" href="../../core-ajax/core-ajax.html"> -->
 </head>
 <body>
 
   <!-- You use the document as a place to set up your fixtures. -->
-  <seed-element></seed-element>
+  <x-translate uses="http://apis.is/company?name=blendin"></x-translate>
+
+  <p translate="TEST" id="test">English</p>
+  <div translates="name" id="json" >foobar</div>
 
   <script>
-    var myEl = document.querySelector('seed-element');
+    var xTranslate = document.querySelector('x-translate'),
+        p = document.querySelector('p'),
+        div = document.querySelector('div'),
+        testLang = {
+          TEST: "Testish"
+        };
 
-    suite('<seed-element>', function() {
+    suite('<x-translate>', function() {
 
-      test('defines the "author" property', function() {
-        assert.equal(myEl.author, 'Dimitri Glazkov');
+      test('defines the "use" method', function() {
+        assert.isFunction(xTranslate.use);
       });
 
-      test('says hello', function() {
-        assert.equal(myEl.sayHello(), 'seed-element says, Hello World!');
-
-        var greetings = myEl.sayHello('greetings Earthlings');
-        assert.equal(greetings, 'seed-element says, greetings Earthlings');
+      test('translation using js object', function() {
+        xTranslate.use(testLang);
+        assert.equal(p.textContent, testLang.TEST);
       });
 
-      test('fires lasers', function(done) {
-        myEl.addEventListener('seed-element-lasers-success', function(event) {
-          assert.equal(event.detail.sound, 'Pew pew pew!');
-          done();
-        });
-        myEl.fireLasers();
+      test('translation back to original text', function() {
+        xTranslate.use('default');
+        assert.equal(p.textContent, 'English');
+      });
+
+      //breaks.. Don't know why. returns empty response.
+      test('translation using json', function() {
+        xTranslate.use('json');
+        assert.equal(p.textContent, 'Blendin ehf.');
+      });
+
+      test('logs error on unknown command.', function() {
+        var err = xTranslate.use('foobar');
+        assert.equal(err.message, 'Case not recognized.');
+      });
+
+      //Breaks! even non-existing url returns an empty response.
+      test('logs error on json failure.', function() {
+        var err = xTranslate.use('json');
+        assert.isDefined(err);
       });
 
     });
