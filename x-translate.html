@@ -21,7 +21,7 @@ Element providing translation of text.
   <template>
     <core-ajax
       url=""
-      handleAs="json"
+      handleAs="json">
     </core-ajax>
   </template>
 
@@ -30,7 +30,7 @@ Element providing translation of text.
       'use strict';
 
     Polymer({
-      
+
       ready: function() {
         this.targets = getTranslateTargets();
         checkForJSON(this);
@@ -62,13 +62,13 @@ Element providing translation of text.
           //save reference to x-translate element to use in the eventListener.
           var xTranslate = this;
 
-          this.ajax.addEventListener("core-response", 
+          this.ajax.addEventListener("core-response",
             function(e) {
               newLang = e.detail.response;
               setLang(xTranslate.targets, newLang);
             }
           );
-          this.ajax.addEventListener("core-error", 
+          this.ajax.addEventListener("core-error",
             function(e) {
               var err = Error(e.detail.response);
               console.error(err.stack);
@@ -115,7 +115,7 @@ Element providing translation of text.
         target.elem.textContent = target.default;
       });
     }
-    
+
     function setLang(targets, lang) {
       targets.map(function(currTarget) {
         var target = currTarget;
