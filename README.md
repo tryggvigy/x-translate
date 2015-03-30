@@ -1,9 +1,13 @@
 x-translate
 ============
 
-See the [component page](http://tryggvi.me/x-translate) for more information.
+See the [component page](http://tryggvigy.github.io/x-translate) for more information.
 
 ## &lt;x-translate&gt;
+
+This custom element helps with client-side i18n. Each translatable element has a key attribute translate="<translation-key>" which is then referenced.
+
+![](http://i.imgur.com/J78MkmW.png)
 
 ## Installation
 > bower install x-translate
