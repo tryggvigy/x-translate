@@ -1,5 +1,4 @@
-<link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../core-ajax/core-ajax.html">
+
 
 <!--
 Element providing translation of text.
@@ -16,136 +15,161 @@ Element providing translation of text.
 @status alpha
 @homepage https://github.com/tryggvigy/x-translate
 -->
-<polymer-element name="x-translate" attributes="uses">
+<template>
+  <!-- This element is invisible -->
+</template>
 
-  <template>
-    <core-ajax
-      url=""
-      handleAs="json">
-    </core-ajax>
-  </template>
+<script>
+(function() {
 
-  <script>
-  (function () {
-      'use strict';
+  // Save reference to this script.
+  var currScript = document._currentScript || document.currentScript;
 
-    Polymer({
+  // access above template tag.
+  var tmpl = currScript.ownerDocument.querySelector('template');
 
-      ready: function() {
-        this.targets = getTranslateTargets();
-        checkForJSON(this);
-      },
+  // Create a prototype for a new element that extends HTMLElement
+  var elementProto = Object.create(HTMLElement.prototype);
 
-      /**
-       * The `use` method will translate the text content of all elements marked
-       * with a translation key if it can find said key in the newLang parameter.
-       *
-       * This function can handle three cases.
-       * <ol>
-       *   <li>.use(any javascript object);</li>
-       *   <li>.use('default');</li>
-       *   <li>.use('json');</li>
-       * </ol>
-       * See the demo-page, where each case is shown respectfully.
-       *
-       * @method use
-       * @param {Object|String} newLang The new language definition, or a hint for where it can be found.
-       */
-      use: function(newLang) {
+  elementProto.getTranslateTargets_ = function() {
+    // fetch all elements with the translate attribute.
+    var elems = document.querySelectorAll('[translate]');
 
-        // case: default
-        if(newLang === 'default')
-          return setDefaultLang(this.targets);
-
-        // case: json
-        else if(newLang === 'json') {
-          //save reference to x-translate element to use in the eventListener.
-          var xTranslate = this;
-
-          this.ajax.addEventListener("core-response",
-            function(e) {
-              newLang = e.detail.response;
-              setLang(xTranslate.targets, newLang);
-            }
-          );
-          this.ajax.addEventListener("core-error",
-            function(e) {
-              var err = Error(e.detail.response);
-              console.error(err.stack);
-            }
-          );
-
-          //fire off the ajax request.
-          this.ajax.go();
-        }
-
-        //case: javascript object
-        else if(newLang !== null && typeof newLang === 'object') {
-          setLang(this.targets, newLang);
-        }
-
-        //if no cases trigger, log an error.
-        else {
-          var err = Error('Case not recognized.');
-          console.error(err.stack);
-          return err;
-        }
-
+    // construct the translateData array from the htmlCollection array.
+    var translateData = [].map.call(elems, function(currEl) {
+      return {
+        elem : currEl,
+        key  : currEl.getAttribute('translate'),
+        default : currEl.textContent
       }
-
     });
+    return translateData;
+  }
 
-    function getTranslateTargets() {
-      // fetch all elements with the translate attribute.
-      var elems = document.querySelectorAll('[translate]');
+  elementProto.setDefaultLang_ = function() {
+    this.targets.forEach(function(target) {
+      target.elem.textContent = target.default;
+    });
+  }
 
-      // construct the translateData array from the htmlCollection array.
-      var translateData = [].map.call(elems, function(currEl) {
-        return {
-          elem : currEl,
-          key  : currEl.getAttribute('translate'),
-          default : currEl.textContent
+  elementProto.setLang_ = function(lang) {
+    this.targets.map(function(currTarget) {
+      var target = currTarget;
+
+      Object.keys(lang).forEach(function(currKey) {
+        if (target.key === currKey) {
+          target.elem.textContent = lang[currKey];
         }
-      });
-      return translateData;
-    }
-
-    function setDefaultLang(targets) {
-      targets.forEach(function(target) {
-        target.elem.textContent = target.default;
-      });
-    }
-
-    function setLang(targets, lang) {
-      targets.map(function(currTarget) {
-        var target = currTarget;
-
-        Object.keys(lang).forEach(function(currKey) {
-          if (target.key === currKey) {
-            target.elem.textContent = lang[currKey];
-          }
-          return target;
-        });
-
         return target;
       });
+
+      return target;
+    });
+  }
+
+  /**
+   * The `use` method will translate the text content of all elements marked
+   * with a translation key if it can find said key in the newLang parameter.
+   *
+   * This function can handle three cases.
+   * <ol>
+   *   <li>.use(any javascript object);</li>
+   *   <li>.use('default');</li>
+   *   <li>.use('json');</li>
+   * </ol>
+   * See the demo-page, where each case is shown respectfully.
+   *
+   * @method use
+   * @param {Object|String} newLang The new language definition, or a hint for where it can be found.
+   */
+  elementProto.use = function(newLang) {
+
+    // case: default
+    if(newLang === 'default')
+      this.setDefaultLang_();
+
+    // case: json
+    else if(newLang === 'json') {
+      this.setLang_(this.jsonData_);
     }
 
-    function checkForJSON(xTranslate) {
-      var ajax = xTranslate.shadowRoot.querySelector('core-ajax');
-
-      if(!xTranslate.uses || xTranslate.uses === '') {
-        //no json is being used.
-        return;
-      }
-
-      ajax.setAttribute('url', xTranslate.uses);
-
-      xTranslate.ajax = ajax;
+    //case: javascript object
+    else if(newLang !== null && typeof newLang === 'object') {
+      this.setLang_(newLang);
+    }
+    //if no cases trigger, log an error.
+    else {
+      var err = Error('Case not recognized.');
+      console.error(err.stack);
+      return err;
     }
 
-  })();
+  };
 
-  </script>
+  elementProto.checkForJson_ = function() {
+    var usesAttr = this.getAttribute('uses');
+    if(usesAttr === '') {
+      //no json is being used.
+      return false;
+    }
+    return usesAttr;
+  }
 
-</polymer-element>
+  elementProto.fetchJsonData_ = function(callback) {
+    if ("function" != typeof callback)
+      throw Error("listener is a required param of fetchJsonData_() "+
+                  "and should be a Function.");
+
+    var httpRequest = new XMLHttpRequest();
+
+    httpRequest.onreadystatechange = function() {
+        if (httpRequest.readyState === 4) {
+            if (httpRequest.status === 200 || httpRequest.status === 0) {
+                var data = JSON.parse(httpRequest.responseText);
+                callback(data);
+            }
+            else {
+              console.error("HTTP error "+this.status+" "+this.statusText);
+            }
+        }
+    };
+    httpRequest.open('GET', this.jsonPath_);
+    httpRequest.send(); 
+  };
+
+  // ===========================
+  // Native functions.
+  // ===========================
+
+  // Setup our Shadow DOM and clone the template
+  elementProto.createdCallback = function() {
+    var root = this.createShadowRoot();
+    root.appendChild(document.importNode(tmpl.content, true));
+  };
+
+  // Fires when an instance was inserted into the document. Kindof constructor.
+  elementProto.attachedCallback = function() {
+    this.targets = this.getTranslateTargets_();
+    this.jsonPath_ = this.checkForJson_();
+    if(this.jsonPath_) {
+    var xTranslate = this; 
+      this.fetchJsonData_(function(data) {
+        xTranslate.jsonData_ = data;
+      });
+    }
+  };
+
+  // Fires when an instance was removed from the document
+  elementProto.detachedCallback = function() {};
+
+  // Fires when an attribute was added, removed, or updated
+  elementProto.attributeChangedCallback = function(attr, oldVal, newVal) {};
+
+
+  // Register our new element
+  var element = document.registerElement('x-translate', {
+    prototype: elementProto
+  });
+
+})();
+</script>

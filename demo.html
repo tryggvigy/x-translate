@@ -1,12 +1,3 @@
-<!--
-    @license
-    Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
-    This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-    The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-    The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-    Code distributed by Google as part of the polymer project is also
-    subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
 <!doctype html>
 <html>
 <head>
@@ -14,72 +5,53 @@
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
   <title>seed-element Demo</title>
 
-  <script src="../webcomponentsjs/webcomponents.min.js"></script>
   <link rel="import" href="x-translate.html">
+  <script src="../webcomponentsjs/webcomponents.min.js"></script>
 
 </head>
-<body unresolved>
-  <x-translate class="primary" uses="IS.json"></x-translate>
-  <x-translate class="secondary" uses="ALT.json"></x-translate>
+<body>
+  <x-translate class="primary" uses="demo-langs/icelandic.json"></x-translate>
   <x-translate class="dutch" uses="demo-langs/dutch.json"></x-translate>
 
-   <main>
-    <button class="icelandic">icelandic</button>
-    <button class="default">default</button>
-    <button class="json">json</button>
+  <main>
+    <button class="icelandic">Icelandic js object</button>
+    <button class="icelandic-json">Icelandic json</button>
     <span> - </span>
-    <button class="other">use other</button>
-    <button class="other-json">use other json</button>
-    <button class="dutch-json">dutch.</button>
+    <button class="default">translate back to default</button>
+    <span> - </span>
+    <button class="dutch-json">Dutch json</button>
     <p translate="HEADER"> header </p>
-    <p translate="FOO"> i am in english </p>
-    <p translate="BAR"> only affected by other and default </p>
+    <p translate="FOO"> i am in english.</p>
   </main>
 
   <script>
-    document.addEventListener('polymer-ready', function() {
 
       var langIS = {
         HEADER : 'haus',
-        FOO: 'ég er á íslensku'
-      }
-      var langOther = {
-        HEADER : 'other-header',
-        FOO: 'other-foo',
-        BAR: 'other-bar',
+        FOO: 'ég er á íslensku.'
       }
 
       // x-translate custom elements
-      var xTranslate1 = document.querySelector('x-translate.primary');
-      var xTranslate2 = document.querySelector('x-translate.secondary');
+      var xTranslateIcelandic = document.querySelector('x-translate.primary');
       var xTranslateDutch = document.querySelector('x-translate.dutch');
 
       document.querySelector('.icelandic').addEventListener('click', function() {
-        xTranslate1.use(langIS);
+        xTranslateIcelandic.use(langIS);
       });
 
       // if 'default' is passed into use(), the original text will be applied.
       document.querySelector('.default').addEventListener('click', function() {
-        xTranslate1.use('default');
+        xTranslateIcelandic.use('default');
       });
 
-      document.querySelector('.json').addEventListener('click', function() {
-        xTranslate1.use('json');
-      });
-
-      document.querySelector('.other').addEventListener('click', function() {
-        xTranslate2.use(langOther);
-      });
-
-      document.querySelector('.other-json').addEventListener('click', function() {
-        xTranslate2.use('json');
+      document.querySelector('.icelandic-json').addEventListener('click', function() {
+        xTranslateIcelandic.use('json');
       });
 
       document.querySelector('.dutch-json').addEventListener('click', function() {
         xTranslateDutch.use('json');
       });
 
-    });
   </script>
 
 </body>
