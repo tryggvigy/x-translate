@@ -1,0 +1,175 @@
+
+
+<!--
+Element providing translation of text.
+
+##### Example
+
+    <x-translate></x-translate>
+
+    <h1> translate="HEADER">I will take the value of HEADER.</h1>
+    <p> translate="ABOUT">I'll become the value of the ABOUT key.</h1>
+
+@element x-translate
+@blurb Element providing translation of text.
+@status alpha
+@homepage https://github.com/tryggvigy/x-translate
+-->
+<template>
+  <!-- This element is invisible -->
+</template>
+
+<script>
+(function() {
+
+  // Save reference to this script.
+  var currScript = document._currentScript || document.currentScript;
+
+  // access above template tag.
+  var tmpl = currScript.ownerDocument.querySelector('template');
+
+  // Create a prototype for a new element that extends HTMLElement
+  var elementProto = Object.create(HTMLElement.prototype);
+
+  elementProto.getTranslateTargets_ = function() {
+    // fetch all elements with the translate attribute.
+    var elems = document.querySelectorAll('[translate]');
+
+    // construct the translateData array from the htmlCollection array.
+    var translateData = [].map.call(elems, function(currEl) {
+      return {
+        elem : currEl,
+        key  : currEl.getAttribute('translate'),
+        default : currEl.textContent
+      }
+    });
+    return translateData;
+  }
+
+  elementProto.setDefaultLang_ = function() {
+    this.targets.forEach(function(target) {
+      target.elem.textContent = target.default;
+    });
+  }
+
+  elementProto.setLang_ = function(lang) {
+    this.targets.map(function(currTarget) {
+      var target = currTarget;
+
+      Object.keys(lang).forEach(function(currKey) {
+        if (target.key === currKey) {
+          target.elem.textContent = lang[currKey];
+        }
+        return target;
+      });
+
+      return target;
+    });
+  }
+
+  /**
+   * The `use` method will translate the text content of all elements marked
+   * with a translation key if it can find said key in the newLang parameter.
+   *
+   * This function can handle three cases.
+   * <ol>
+   *   <li>.use(any javascript object);</li>
+   *   <li>.use('default');</li>
+   *   <li>.use('json');</li>
+   * </ol>
+   * See the demo-page, where each case is shown respectfully.
+   *
+   * @method use
+   * @param {Object|String} newLang The new language definition, or a hint for where it can be found.
+   */
+  elementProto.use = function(newLang) {
+
+    // case: default
+    if(newLang === 'default')
+      this.setDefaultLang_();
+
+    // case: json
+    else if(newLang === 'json') {
+      this.setLang_(this.jsonData_);
+    }
+
+    //case: javascript object
+    else if(newLang !== null && typeof newLang === 'object') {
+      this.setLang_(newLang);
+    }
+    //if no cases trigger, log an error.
+    else {
+      var err = Error('Case not recognized.');
+      console.error(err.stack);
+      return err;
+    }
+
+  };
+
+  elementProto.checkForJson_ = function() {
+    var usesAttr = this.getAttribute('uses');
+    if(usesAttr === '') {
+      //no json is being used.
+      return false;
+    }
+    return usesAttr;
+  }
+
+  elementProto.fetchJsonData_ = function(callback) {
+    if ("function" != typeof callback)
+      throw Error("listener is a required param of fetchJsonData_() "+
+                  "and should be a Function.");
+
+    var httpRequest = new XMLHttpRequest();
+
+    httpRequest.onreadystatechange = function() {
+        if (httpRequest.readyState === 4) {
+            if (httpRequest.status === 200 || httpRequest.status === 0) {
+                var data = JSON.parse(httpRequest.responseText);
+                callback(data);
+            }
+            else {
+              console.error("HTTP error "+this.status+" "+this.statusText);
+            }
+        }
+    };
+    httpRequest.open('GET', this.jsonPath_);
+    httpRequest.send(); 
+  };
+
+  // ===========================
+  // Native functions.
+  // ===========================
+
+  // Setup our Shadow DOM and clone the template
+  elementProto.createdCallback = function() {
+    var root = this.createShadowRoot();
+    root.appendChild(document.importNode(tmpl.content, true));
+  };
+
+  // Fires when an instance was inserted into the document. Kindof constructor.
+  elementProto.attachedCallback = function() {
+    this.targets = this.getTranslateTargets_();
+    this.jsonPath_ = this.checkForJson_();
+    if(this.jsonPath_) {
+    var xTranslate = this; 
+      this.fetchJsonData_(function(data) {
+        xTranslate.jsonData_ = data;
+      });
+    }
+  };
+
+  // Fires when an instance was removed from the document
+  elementProto.detachedCallback = function() {};
+
+  // Fires when an attribute was added, removed, or updated
+  elementProto.attributeChangedCallback = function(attr, oldVal, newVal) {};
+
+
+  // Register our new element
+  var element = document.registerElement('x-translate', {
+    prototype: elementProto
+  });
+
+})();
+</script>

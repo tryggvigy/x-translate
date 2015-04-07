@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <title>seed-element Demo</title>
+
+  <link rel="import" href="x-translate.html">
+  <script src="../webcomponentsjs/webcomponents.min.js"></script>
+
+</head>
+<body>
+  <x-translate class="primary" uses="demo-langs/icelandic.json"></x-translate>
+  <x-translate class="dutch" uses="demo-langs/dutch.json"></x-translate>
+
+  <main>
+    <button class="icelandic">Icelandic js object</button>
+    <button class="icelandic-json">Icelandic json</button>
+    <span> - </span>
+    <button class="default">translate back to default</button>
+    <span> - </span>
+    <button class="dutch-json">Dutch json</button>
+    <p translate="HEADER"> header </p>
+    <p translate="FOO"> i am in english.</p>
+  </main>
+
+  <script>
+
+      var langIS = {
+        HEADER : 'haus',
+        FOO: 'ég er á íslensku.'
+      }
+
+      // x-translate custom elements
+      var xTranslateIcelandic = document.querySelector('x-translate.primary');
+      var xTranslateDutch = document.querySelector('x-translate.dutch');
+
+      document.querySelector('.icelandic').addEventListener('click', function() {
+        xTranslateIcelandic.use(langIS);
+      });
+
+      // if 'default' is passed into use(), the original text will be applied.
+      document.querySelector('.default').addEventListener('click', function() {
+        xTranslateIcelandic.use('default');
+      });
+
+      document.querySelector('.icelandic-json').addEventListener('click', function() {
+        xTranslateIcelandic.use('json');
+      });
+
+      document.querySelector('.dutch-json').addEventListener('click', function() {
+        xTranslateDutch.use('json');
+      });
+
+  </script>
+
+</body>
+</html>
